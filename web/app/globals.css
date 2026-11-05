@@ -1,0 +1,252 @@
+@import "tailwindcss";
+
+/* Warm-paper palette shared with ledger-web / human-graph, plus a warm dark counterpart.
+   Chosen deliberately over a "terminal" look: dives run 1,000+ words and this is a reading
+   surface, not a monitor.
+
+   Every colour used for *text* below is at or above WCAG AA (4.5:1) against the surface it
+   sits on. That is not pedantry here -- the previous ramp put the least legible colour
+   (#9e9888, 2.75:1) on the smallest, most letter-spaced text on the page, and #b4ae9e (2.12:1)
+   carried a whole paragraph. `fainter` survives for decoration only: bullet dots and hairlines,
+   never words. */
+@theme {
+  --color-cream: #f0eee6;
+  --color-surface: #fbfaf5;
+  --color-wash: #f4f2ea;
+  --color-field: #efece3;
+  --color-line: #e2ddd0;
+  --color-line-soft: #eae5d9;
+  --color-ink: #1a1915;      /* 12.9:1 */
+  --color-ink-soft: #34302a; /* 12.5:1 -- dive prose */
+  --color-muted: #5f5a4f;    /*  6.6:1 -- secondary body */
+  --color-faint: #736e64;    /*  4.9:1 -- uppercase micro-labels */
+  --color-fainter: #a29c8d;  /*  2.6:1 -- DECORATION ONLY, never text */
+  --color-accent: #c15f3c;
+  --color-accent-deep: #a94b2a; /* 5.2:1 -- it is link text, so it has to clear AA too */
+  --color-accent-soft: #f3e7df;
+
+  /* Risk semantics. risk-on is green, risk-off red, ambiguous indigo -- ambiguous gets its own
+     colour rather than grey because it is a real verdict, not a missing one. */
+  --color-on: #3d6a49;
+  --color-on-soft: #e4ede3;
+  --color-off: #b02e20;
+  --color-off-soft: #f7e3df;
+  --color-amb: #545794;
+  --color-amb-soft: #eae7f3;
+
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), Charter, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+/* Dark is opt-in via the reader control, not prefers-color-scheme: the default for a paper-like
+   long-form surface is paper. `html[data-theme]` (0,1,1) outranks `:root` (0,1,0), so overriding
+   the same custom properties re-themes every Tailwind utility built from them. */
+html[data-theme="dark"] {
+  --color-cream: #14140f;
+  --color-surface: #1c1b16;
+  --color-wash: #23221c;
+  --color-field: #2a2822;
+  --color-line: #34322a;
+  --color-line-soft: #2b2922;
+  --color-ink: #f2efe4;      /* 15.6:1 */
+  --color-ink-soft: #ddd8c9; /* 12.1:1 -- dive prose */
+  --color-muted: #a8a293;    /*  6.8:1 */
+  --color-faint: #8d8779;    /*  4.8:1 */
+  --color-fainter: #635e53;  /* decoration only */
+  --color-accent: #e08a67;
+  --color-accent-deep: #ec9a78;
+  --color-accent-soft: #3a2a22;
+
+  --color-on: #7fbf93;
+  --color-on-soft: #1f2f24;
+  --color-off: #ef8878;
+  --color-off-soft: #35211d;
+  --color-amb: #9b9fe0;
+  --color-amb-soft: #24243a;
+
+  color-scheme: dark;
+}
+
+/* Prose size is the only thing the A/A/A control moves. Chrome stays put on purpose -- the
+   control is for reading text, and rescaling labels and tables with it just makes the page
+   wobble without making anything easier to read. */
+:root {
+  --prose-size: 1.1875rem; /* 19px */
+}
+html[data-size="s"] {
+  --prose-size: 1.0625rem; /* 17px */
+}
+html[data-size="l"] {
+  --prose-size: 1.3125rem; /* 21px */
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+  a {
+    color: var(--color-accent-deep);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+/* Five steps, not fourteen. Components use these instead of one-off text-[Npx] so the page has
+   an actual scale and the smallest legible size is enforced in one place. */
+.t-label {
+  font-size: 0.6875rem; /* 11px */
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+.t-meta {
+  font-size: 0.75rem; /* 12px */
+  color: var(--color-muted);
+}
+.t-ui {
+  font-size: 0.875rem; /* 14px */
+}
+.t-ui-lg {
+  font-size: 0.9375rem; /* 15px */
+}
+
+/* Reading surfaces. All three scale with the A/A/A control. */
+.prose-lede {
+  font-family: var(--font-serif);
+  font-size: calc(var(--prose-size) * 0.94);
+  line-height: 1.62;
+  color: var(--color-ink-soft);
+  max-width: 62ch;
+}
+.prose-note {
+  font-size: calc(var(--prose-size) * 0.8);
+  line-height: 1.58;
+  color: var(--color-ink-soft);
+  max-width: 68ch;
+}
+
+/* Rendered dive bodies. The markdown renderer emits plain tags; style them here so the analysis
+   reads like an article rather than a data dump.
+
+   max-width is in ch and lives on the prose alone, not on the page shell: the market table and
+   the card headers genuinely want the full 52rem, but at that width the body ran ~92 characters
+   per line. Past ~85 the eye starts missing the return sweep, which is felt as "hard to read"
+   without an obvious cause. 64ch lands around 68-72 actual characters at any size the control
+   selects, because ch tracks the font. */
+.prose-dive {
+  font-family: var(--font-serif);
+  font-size: var(--prose-size);
+  line-height: 1.68;
+  color: var(--color-ink-soft);
+  max-width: 64ch;
+}
+.prose-dive h2 {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-accent-deep);
+  margin: 2.1rem 0 0.7rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--color-line);
+}
+.prose-dive h2:first-child {
+  margin-top: 0;
+}
+.prose-dive h3 {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 1.4rem 0 0.4rem;
+}
+.prose-dive p {
+  margin: 0.85rem 0;
+}
+.prose-dive strong {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.prose-dive em {
+  font-style: italic;
+}
+.prose-dive ul,
+.prose-dive ol {
+  margin: 0.85rem 0;
+  padding-left: 1.35rem;
+}
+.prose-dive li {
+  margin: 0.4rem 0;
+  list-style: disc;
+}
+.prose-dive ol > li {
+  list-style: decimal;
+}
+.prose-dive blockquote {
+  margin: 1rem 0;
+  padding: 0.15rem 0 0.15rem 1rem;
+  border-left: 3px solid var(--color-line);
+  color: var(--color-muted);
+}
+.prose-dive code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--color-field);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+/* Tables are data, not prose: they get the full card width back and drop to the UI font. */
+.prose-dive .table-wrap {
+  max-width: none;
+  width: 100%;
+}
+.prose-dive table {
+  width: 100%;
+  margin: 1.1rem 0;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
+}
+.prose-dive th,
+.prose-dive td {
+  border: 1px solid var(--color-line);
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+.prose-dive th {
+  background: var(--color-wash);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.prose-dive hr {
+  margin: 1.6rem 0;
+  border: 0;
+  border-top: 1px solid var(--color-line);
+}
+.prose-dive a {
+  text-decoration: underline;
+  text-decoration-color: var(--color-fainter);
+  text-underline-offset: 2px;
+}

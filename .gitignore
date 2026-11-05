@@ -1,0 +1,84 @@
+# daily-macro-brief (local dir: daily-feeds/)
+# Rule of thumb: anything secret, personal, generated at runtime or re-downloadable stays out of git.
+
+# --- Secrets & credentials -----------------------------------------------------
+# No .env file is used today. These guard against one being added by accident.
+# The Gemini key (only for `speech.py --engine gemini`) lives in ~/.openclaw/openclaw.json,
+# outside this repo, or in the GEMINI_API_KEY / GOOGLE_API_KEY environment variables.
+.env
+.env.*
+!.env.example
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# --- Private data --------------------------------------------------------------
+# The real watchlist holds the owner's positions. Only config/watchlist.example.json
+# (placeholder tickers, schema reference) is tracked.
+/config/watchlist.json
+
+# --- Databases (SQLite, WAL sidecars included) ----------------------------------
+# Live data is ~/.openclaw/data/daily-feeds.sqlite, outside the repo.
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+
+# --- Audio, media and TTS voice models -----------------------------------------
+# Anchored to the repo root on purpose: an unanchored "audio/" would also ignore the tracked
+# route source in web/app/api/audio/.
+/audio/
+/media/
+/daily-feeds-audio/
+*.m4a
+*.wav
+*.mp3
+*.ogg
+# Piper voice models (they live in ~/.local/share/piper-voices)
+*.onnx
+*.onnx.json
+
+# --- Logs -----------------------------------------------------------------------
+# systemd appends to logs/run.log and logs/tickers.log; recreate the directory with `mkdir -p logs`.
+logs/
+*.log
+npm-debug.log*
+
+# --- Python ---------------------------------------------------------------------
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# --- Node / Next.js (web/) ------------------------------------------------------
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+
+# --- Backups, editors, OS -------------------------------------------------------
+*.bak*
+*.orig
+*.swp
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# --- Claude Code ----------------------------------------------------------------
+# Keep .claude/skills/macro-dive/SKILL.md tracked: scripts/dive.py reads it at runtime and
+# appends it to every dive's system prompt. Only per-machine state is ignored.
+.claude/settings.local.json
+.claude/*.local.*
+CLAUDE.local.md

@@ -1,0 +1,60 @@
+{
+  "_README": [
+    "SCHEMA REFERENCE ONLY. The watchlist now lives in SQLite and is edited in the",
+    "dashboard: https://openclaw-vps.tail0d53dc.ts.net:8446/watchlist",
+    "",
+    "This file is kept to document the shape of the data and to seed the DB if you",
+    "prefer to start from a file: copy it to config/watchlist.json, fill it in, then",
+    "run `python3 scripts/seed_watchlist.py`.",
+    "",
+    "The tickers below are STRUCTURAL PLACEHOLDERS to show the schema — they are NOT",
+    "recommendations and are NOT your positions. With an empty watchlist the dive",
+    "speaks only in sectors and Growth250 beta rather than inventing names.",
+    "",
+    "status: hold | watch    (hold = you own it; watch = candidate)",
+    "beta_tag: high | mid | low   — your own read on how much it moves with risk appetite",
+    "drivers: what actually moves this name, so the dive can connect a macro event to it"
+  ],
+  "book_style": {
+    "long": "small-cap / high-beta Japanese equities",
+    "hedge": "short Nikkei 225 micro futures",
+    "note": "Hedge is directional-neutral protection for the long book, not a standalone short."
+  },
+  "positions": [
+    {
+      "ticker": "0000",
+      "name": "PLACEHOLDER — replace me",
+      "market": "TSE Growth",
+      "sector": "semis-adjacent",
+      "status": "watch",
+      "beta_tag": "high",
+      "drivers": ["SOX", "USDJPY", "AI capex"],
+      "thesis": "One line on why you care. The dive uses this to reason about transmission."
+    },
+    {
+      "ticker": "0001",
+      "name": "PLACEHOLDER — replace me",
+      "market": "TSE Standard",
+      "sector": "domestic services",
+      "status": "watch",
+      "beta_tag": "mid",
+      "drivers": ["domestic consumption", "real wages", "inbound tourism"],
+      "thesis": "Domestic-demand names react to yen strength opposite to exporters."
+    }
+  ],
+  "sectors_of_interest": [
+    "semis / semi equipment",
+    "defense",
+    "domestic retail & services",
+    "real estate / REIT",
+    "shipping",
+    "AI / datacenter capex"
+  ],
+  "benchmarks": {
+    "high_beta_proxy": "2516.T",
+    "broad_jp": "1305.T",
+    "index": "^N225",
+    "fx": "JPY=X",
+    "global_risk": ["^VIX", "^SOX", "^GSPC"]
+  }
+}

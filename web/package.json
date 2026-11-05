@@ -1,0 +1,25 @@
+{
+  "name": "daily-feeds-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 18793",
+    "build": "next build",
+    "start": "next start -H 127.0.0.1 -p 18793",
+    "deploy": "next build && systemctl --user restart daily-feeds-web.service && sleep 2 && curl -sf -o /dev/null http://127.0.0.1:18793/api/brief && echo '✓ deployed — https://openclaw-vps.tail0d53dc.ts.net:8446/'"
+  },
+  "dependencies": {
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "postcss": "^8",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
